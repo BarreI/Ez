@@ -45,7 +45,32 @@ const Ez = (function(){
                 /**
                  * 要素のid
                  */
-                id:null
+                id:null,
+                /**
+                 * 要素の削除
+                 */
+                remove:function(){
+                    elements_array.forEach(element => {
+                        element.remove();
+                    });
+                },
+                /**
+                 * クラスの設定
+                 */
+                class:{
+                    //クラスの追加
+                    add:function(class_name){
+                        elements_array.forEach(element => {
+                            element.classList.add(class_name);
+                        });
+                    },
+                    //クラスの削除
+                    remove:function(class_name){
+                        elements_array.forEach(element => {
+                            element.classList.remove(class_name);
+                        });
+                    }
+                },
             };
 
             //idの設定
@@ -55,6 +80,7 @@ const Ez = (function(){
 
             //値が変更された時イベント設定
             Object.defineProperty(re,"text",{
+
                 set:function(new_value){
                     elements_array.forEach(element => {
                         element.innerText = new_value;

@@ -2,7 +2,7 @@
 ドキュメント内の要素を操作する為のオブジェクトです。
 
 # はじめに
-このオブジェクトを取得するには[要素を取得する](./el.md)に従って対象の要素を取得してください。
+``Ez.el()``もしくは``el_Object.el()``を使用して``el_Object``を取得してください。[Ez.elの説明](./el.md)
 
 # raw 配列 - [Element](https://developer.mozilla.org/ja/docs/Web/API/Element)
 要素のオブジェクトをそのまま返します。
@@ -39,5 +39,26 @@
 ```javascript
     Ez.el(".a/.b").text = "あ";
 ```
+
+# class オブジェクト - クラスの追加と削除
+要素にクラスを追加したり削除します。
+## クラスの追加
+クラス``a``を要素に追加します。
+```javascript
+el_Object.class.add("a");
+```
+## クラスの削除
+クラス``a``を要素から削除します。
+```javascript
+el_Object.class.remove("a");
+```
+
+# remove 関数 - 要素の削除
+要素を削除します。
+```javascript
+el_Object.remove();
+```
+
+
 
 

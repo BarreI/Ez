@@ -6,14 +6,15 @@
 
 ```javascript
 var id_description = Ez.el("#description");
+//これがel_Objectです。
 ```
-
+[el_Objectの使い方](./el_Object.md)
 ``class="description"``の要素を取得します
 ```javascript
 var class_description = Ez.el(".description");
 ```
 
-``<li>"``の要素を取得します
+``<li>``の要素を取得します
 ```javascript
 var class_description = Ez.el("<li");
 //（注意｝Ez.el("<li>");では無くEz.el("<li");です。
