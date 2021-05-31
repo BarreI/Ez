@@ -1,0 +1,23 @@
+{
+  "name": "ez",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "sh ready.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lp0ql/Ez.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lp0ql/Ez/issues"
+  },
+  "homepage": "https://github.com/lp0ql/Ez#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.3.2"
+  }
+}

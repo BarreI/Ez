@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test_page</title>
+    <script src="./index.js"></script>
+</head>
+<body>
+    <div id="box">
+        <div class="a">未</div>
+        <div class="a">未</div>
+        <div class="a">未</div>
+        <div class="a">未</div>
+        <div class="a">未</div>
+        <div id="test">未_test
+            <div id="test_2">
+                子要素
+                <div id="test_3">
+                    更に子要素
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // var box = Ez.el("#box");
+        // box.text = "box_済"
+        // var class_a = box.el(".a");
+        // class_a.text = "済";
+
+        // box.el("#test").text = "済_text";
+
+        var a = Ez.el("#box").el("#test_2")
+        a = a.el("..").el("..").el(".a")
+
+        // var a = Ez.el("#box/#test_2/../../.a");
+
+        console.log(a);
+        
+        a.text = "c";
+
+    </script>
+</body>
+</html>
