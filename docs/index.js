@@ -3,6 +3,24 @@ console.log("Ezを読み込みました。");
  * 汚さないようにする
  */
 var Ez = (function () {
+    //画面がリサイズされた時のイベント
+    function resize_function() {
+        //document.ratioの設定
+        (function () {
+            var height = window.document.documentElement.clientHeight;
+            var width = window.document.documentElement.clientWidth;
+            if (width < height) {
+                Document.ratio = "Vertical";
+            }
+            else {
+                Document.ratio = "Horizontal";
+            }
+            ;
+        })();
+    }
+    ;
+    //リサイズ時に実行
+    window.addEventListener("resize", resize_function);
     var convart_to__el_Object = {
         /**
          * 複数の要素から生成
@@ -165,6 +183,15 @@ var Ez = (function () {
             }
         }
     };
+    ;
+    /**
+     * ページ全体について
+     */
+    var Document = {
+        ratio: "Vertical"
+    };
+    //return 前にリサイズ時のイベントを走らせる
+    resize_function();
     return {
         /**
          * ドキュメント全体を検索
@@ -227,6 +254,7 @@ var Ez = (function () {
                 location = location.el(path);
             });
             return location;
-        }
+        },
+        document: Document
     };
 })();

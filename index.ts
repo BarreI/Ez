@@ -5,6 +5,25 @@ console.log("Ezを読み込みました。");
  */
 const Ez = (function(){
 
+    //画面がリサイズされた時のイベント
+    function resize_function(){
+        //document.ratioの設定
+        (function(){
+            const height:number = window.document.documentElement.clientHeight;
+            const width:number = window.document.documentElement.clientWidth;
+
+            if(width < height){
+                Document.ratio = "Vertical";
+            }else{
+                Document.ratio = "Horizontal";
+            };
+        })();
+    };
+
+    //リサイズ時に実行
+    window.addEventListener("resize",resize_function);
+
+
 
 
     const convart_to__el_Object = {
@@ -67,7 +86,7 @@ const Ez = (function(){
                     //クラスの削除
                     remove:function(class_name){
                         elements_array.forEach(element => {
-                            element.classList.remove(class_name);
+                            element.classList.remove(class_name);   
                         });
                     }
                 },
@@ -179,7 +198,20 @@ const Ez = (function(){
         }
     };
 
+    interface document{
+        ratio:"Vertical"|"Horizontal"
+    };
 
+    /**
+     * ページ全体について
+     */
+    const Document:document = {
+        ratio:"Vertical",
+    };
+
+    
+    //return 前にリサイズ時のイベントを走らせる
+    resize_function();
     return {
         /**
          * ドキュメント全体を検索
@@ -238,8 +270,8 @@ const Ez = (function(){
                 location = location.el(path);
             });
             return location;
-
-        }
+        },
+        document:Document
     };
 
 })();

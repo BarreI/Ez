@@ -8,21 +8,11 @@
     <script src="./index.js"></script>
 </head>
 <body>
-    <div id="box">
-        <div class="a">未</div>
-        <div class="a">未</div>
-        <div class="a">未</div>
-        <div class="a">未</div>
-        <div class="a">未</div>
-        <div id="test">未_test
-            <div id="test_2">
-                子要素
-                <div id="test_3">
-                    更に子要素
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="a"></div>    
+    <div class="a"></div>
+    <div class="a b"></div>
+    <div class="a"></div>
+    <div class="a"></div>
 
     <script>
         // var box = Ez.el("#box");
@@ -40,7 +30,16 @@
         // Ez.el(".a").class.add("b");
         // Ez.el(".a").class.remove("a");
 
-        Ez.el(".a").remove();
+        // var a = Ez.el(".a");
+
+        // a.remove();
+        // a.remove();
+
+        // a.text = "a"
+
+        window.addEventListener("resize",function(){
+            console.log(Ez.document.ratio);
+        });
 
     </script>
 </body>

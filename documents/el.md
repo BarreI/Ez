@@ -1,4 +1,4 @@
-# Ez.el
+# Ez.el - 要素の取得
 要素を取得します。
 
 ## ドキュメント全体から取得
@@ -60,3 +60,14 @@ var id_a = id_c.el("../..");
 
 
 ## [取得できる内容](./el_Object.md)
+
+# document - ページ全体の情報
+ページ全体の情報を取得します。
+
+```javascript
+Ez.document
+```
+## [取得できる内容](./el_document.md)
+
+
+
