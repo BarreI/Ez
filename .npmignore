@@ -1,0 +1,8 @@
+docs*
+node_modules*
+global_test.html
+package-lock.json
+ready.sh
+test.html
+test_server*
+npm_publish.sh

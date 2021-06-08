@@ -1,6 +1,6 @@
 {
-  "name": "ez",
-  "version": "1.0.0",
+  "name": "@lp0ql/ez",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,9 +8,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lp0ql/Ez.git"
+    "url": "git://github.com/lp0ql/Ez.git"
   },
-  "author": "",
+  "author": "lp0ql <59675400+lp0ql@users.noreply.github.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/lp0ql/Ez/issues"
