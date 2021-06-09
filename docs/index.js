@@ -254,7 +254,15 @@ var Ez = (function () {
      * ページ全体について
      */
     var Document = {
-        ratio: "Vertical"
+        ratio: "Vertical",
+        title: {
+            set: function (title) {
+                window.document.title = title;
+            },
+            get: function () {
+                return window.document.title;
+            }
+        }
     };
     //return 前にリサイズ時のイベントを走らせる
     resize_function();

@@ -148,7 +148,6 @@ const Ez = (function(){
                      * @param {object} settings -スタイルの設定
                      */
                     MultiSet:function(settings:{[keys:string]:string}){
-
                         Object.keys(settings).forEach(property_name => {
                             elements_array.forEach(element => {
                                 element.style[property_name] = settings[property_name];
@@ -288,7 +287,11 @@ const Ez = (function(){
     };
 
     interface document{
-        ratio:"Vertical"|"Horizontal"
+        ratio:"Vertical"|"Horizontal",
+        title:{
+            set(title:string):void,
+            get():string
+        }
     };
 
     /**
@@ -296,6 +299,14 @@ const Ez = (function(){
      */
     const Document:document = {
         ratio:"Vertical",
+        title:{
+            set:function(title){
+                window.document.title = title;
+            },
+            get:function(){
+                return window.document.title
+            }
+        }
     };
 
     

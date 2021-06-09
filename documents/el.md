@@ -8,7 +8,7 @@
 var id_description = Ez.el("#description");
 //これがel_Objectです。
 ```
-[el_Objectの使い方](./el_Object.md)
+
 
 ``class="description"``の要素を取得します
 ```javascript
@@ -57,9 +57,8 @@ var id_a = id_c.el("../..");
 
 
 ```
+## [取得したel_Objectを使用する](./el_Object.md)
 
-
-## [取得できる内容](./el_Object.md)
 
 # document - ページ全体の情報
 ページ全体の情報を取得します。
@@ -67,7 +66,7 @@ var id_a = id_c.el("../..");
 ```javascript
 Ez.document
 ```
-## [取得できる内容](./el_document.md)
+## [Ez.documentを使用する](./el_document.md)
 
 
 
