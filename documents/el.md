@@ -66,7 +66,7 @@ var id_a = id_c.el("../..");
 ```javascript
 Ez.document
 ```
-## [Ez.documentを使用する](./el_document.md)
+## [Ez.documentを使用する](./El_document.md)
 
 
 
