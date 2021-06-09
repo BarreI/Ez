@@ -5,6 +5,8 @@ console.log("Ezを読み込みました。");
  */
 const Ez = (function(){
 
+    
+
     //画面がリサイズされた時のイベント
     function resize_function(){
         //document.ratioの設定
@@ -32,13 +34,36 @@ const Ez = (function(){
          * @param {Array} element - 取得したデータ
          * @param path - 取得に使用したテキスト
          */
-        convart:function(elements_array,path:String){
-            let re = {
+        convart:function(elements_array,path:string){
+            //複数のスタイルを同時に設定する時に使用するオブジェクト
+
+            interface el_Object {
+                el(path:string):el_Object,
+                remove():void,
+                class:{
+                    add(class_name:string):void,
+                    remove(class_name:string):void
+                },
+                style:{
+                    get(property_name:string):string,
+                    set(property_name:string,value:string|number):void
+                    MultiSet(settings:{[keys:string]:string}):void
+                },
+                text:{
+                    get():string | null,
+                    set(value:string|number):void
+                },
+                raw:Element[],
+                id?:string | null,
+
+            };
+
+            let re:el_Object = {
                 /**
                  * 要素内で要素を検索 or 親要素へ移動
                  * @param path - 要素のid、クラス、タグ
                  */
-                el:function(path:String){
+                el:function(path:string){
 
                     function core(path){
                         return convart_to__el_Object.process.el(elements_array,path);
@@ -60,7 +85,77 @@ const Ez = (function(){
                 /**
                  * 要素内のテキスト
                  */
-                text:"",
+                text:{
+                    /**
+                     * - 要素のテキストを取得
+                     * - 複数の要素に対して実行した場合どの値が取得できるかは不明
+                     */
+                    get:function(){
+                        var text = null;
+                        try{
+                            text = elements_array[0].innerText
+                        }catch{
+                            console.warn("テキストの取得に失敗しました。");
+                        };
+
+                        if(text){
+                            return text;
+                        }else{
+                            return null;
+                        }
+                    },
+                    /**
+                     * 要素のテキストを更新する
+                     * @param {string} value - 内容 
+                     */
+                    set:function(value:string){
+                        elements_array.forEach(element => {
+                            element.innerText = value;
+                        });
+                    }
+                },
+                /**
+                 * スタイルの取得と設定
+                 */
+                style:{
+                    /**
+                     * - スタイルの取得
+                     * - 複数のオブジェクトに対して実行する場合、どのオブジェクトのスタイルか不明
+                     * @param {string} property_name - スタイルのプロパティ名を入力します 
+                     */
+                    get:function(property_name:string){
+                        try{
+                            return window.getComputedStyle(elements_array[0],null)[property_name]
+                        }catch(e){
+                            console.warn("スタイル" + property_name + "が取得できませんでした。値が正しい事を確認してください。");
+                            console.warn(e);
+                        };
+                    },
+
+                    /**
+                     *  - スタイルの設定・更新
+                     * @param property_name 
+                     * @param value 
+                     */
+                    set:function(property_name:string,value:string | number){
+                        elements_array.forEach(element => {
+                            element.style[property_name] = value;
+                        });
+                    },
+
+                    /**
+                     * - 複数のスタイルを同時に設定 
+                     * @param {object} settings -スタイルの設定
+                     */
+                    MultiSet:function(settings:{[keys:string]:string}){
+
+                        Object.keys(settings).forEach(property_name => {
+                            elements_array.forEach(element => {
+                                element.style[property_name] = settings[property_name];
+                            });
+                        });
+                    }
+                },
                 /**
                  * 要素のid
                  */
@@ -90,6 +185,9 @@ const Ez = (function(){
                         });
                     }
                 },
+                /**
+                 * スタイルの設定
+                 */
             };
 
             //idの設定
@@ -97,17 +195,8 @@ const Ez = (function(){
                 re.id = elements_array[0].id;
             };
 
-            //値が変更された時イベント設定
-            Object.defineProperty(re,"text",{
-
-                set:function(new_value){
-                    elements_array.forEach(element => {
-                        element.innerText = new_value;
-                    });
-                }
-            });
             
-
+            //要素が一つも取得できない時警告を表示
             if(elements_array.length == 0){
                 console.warn(path + "によって取得された要素数は0です。");
             };
@@ -123,7 +212,7 @@ const Ez = (function(){
              * @param elements 
              * @param path 
              */
-            el:function(elements,path:String){
+            el:function(elements,path:string){
                 
                 if(path == ".."){
                     //親要素の取得
@@ -217,7 +306,7 @@ const Ez = (function(){
          * ドキュメント全体を検索
          * @param path - #id .class
          */
-        el:function(path:String){
+        el:function(path:string){
             //メインの処理
             function core(path){
                 /**

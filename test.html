@@ -10,7 +10,7 @@
 <body>
     <div class="a"></div>    
     <div class="a"></div>
-    <div class="a b"></div>
+    <div class="a b" style="position: fixed;left: 50%;"></div>
     <div class="a"></div>
     <div class="a"></div>
 
@@ -37,9 +37,24 @@
 
         // a.text = "a"
 
-        window.addEventListener("resize",function(){
-            console.log(Ez.document.ratio);
+        // window.addEventListener("resize",function(){
+        //     console.log(Ez.document.ratio);
+        // });
+
+        var class_b = Ez.el(".b");
+
+        class_b.style.MultiSet({
+            position:"absolute",
+            left:"5%",
+            top:"5%",
+            width:"10%",
+            height:"10%",
+            color:"white"
         });
+
+        class_b.style.set("backgroundColor","black");
+
+        class_b.text.set("あいうえお");
 
     </script>
 </body>

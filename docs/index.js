@@ -28,6 +28,8 @@ var Ez = (function () {
          * @param path - 取得に使用したテキスト
          */
         convart: function (elements_array, path) {
+            //複数のスタイルを同時に設定する時に使用するオブジェクト
+            ;
             var re = {
                 /**
                  * 要素内で要素を検索 or 親要素へ移動
@@ -51,7 +53,78 @@ var Ez = (function () {
                 /**
                  * 要素内のテキスト
                  */
-                text: "",
+                text: {
+                    /**
+                     * - 要素のテキストを取得
+                     * - 複数の要素に対して実行した場合どの値が取得できるかは不明
+                     */
+                    get: function () {
+                        var text = null;
+                        try {
+                            text = elements_array[0].innerText;
+                        }
+                        catch (_a) {
+                            console.warn("テキストの取得に失敗しました。");
+                        }
+                        ;
+                        if (text) {
+                            return text;
+                        }
+                        else {
+                            return null;
+                        }
+                    },
+                    /**
+                     * 要素のテキストを更新する
+                     * @param {string} value - 内容
+                     */
+                    set: function (value) {
+                        elements_array.forEach(function (element) {
+                            element.innerText = value;
+                        });
+                    }
+                },
+                /**
+                 * スタイルの取得と設定
+                 */
+                style: {
+                    /**
+                     * - スタイルの取得
+                     * - 複数のオブジェクトに対して実行する場合、どのオブジェクトのスタイルか不明
+                     * @param {string} property_name - スタイルのプロパティ名を入力します
+                     */
+                    get: function (property_name) {
+                        try {
+                            return window.getComputedStyle(elements_array[0], null)[property_name];
+                        }
+                        catch (e) {
+                            console.warn("スタイル" + property_name + "が取得できませんでした。値が正しい事を確認してください。");
+                            console.warn(e);
+                        }
+                        ;
+                    },
+                    /**
+                     *  - スタイルの設定・更新
+                     * @param property_name
+                     * @param value
+                     */
+                    set: function (property_name, value) {
+                        elements_array.forEach(function (element) {
+                            element.style[property_name] = value;
+                        });
+                    },
+                    /**
+                     * - 複数のスタイルを同時に設定
+                     * @param {object} settings -スタイルの設定
+                     */
+                    MultiSet: function (settings) {
+                        Object.keys(settings).forEach(function (property_name) {
+                            elements_array.forEach(function (element) {
+                                element.style[property_name] = settings[property_name];
+                            });
+                        });
+                    }
+                },
                 /**
                  * 要素のid
                  */
@@ -87,14 +160,7 @@ var Ez = (function () {
                 re.id = elements_array[0].id;
             }
             ;
-            //値が変更された時イベント設定
-            Object.defineProperty(re, "text", {
-                set: function (new_value) {
-                    elements_array.forEach(function (element) {
-                        element.innerText = new_value;
-                    });
-                }
-            });
+            //要素が一つも取得できない時警告を表示
             if (elements_array.length == 0) {
                 console.warn(path + "によって取得された要素数は0です。");
             }

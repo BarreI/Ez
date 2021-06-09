@@ -32,12 +32,19 @@
 ``Ez.el``で指定した条件に一致する要素が一つしかない場合、その要素のidが設定されます。
 
 
-# text 文字列 - 文字を設定
+# text オブジェクト - 文字の追加・変更と取得
+
+## 文字の追加・更新
 文字列を設定、更新します。
 
 クラス``a`` の中にあるクラス``b``が全て``あ``になります。
 ```javascript
-    Ez.el(".a/.b").text = "あ";
+    Ez.el(".a/.b").text.set("あ");
+```
+
+## 文字の取得
+```javascript
+    var now_text = Ez.el(".a/.b").text.get();
 ```
 
 # class オブジェクト - クラスの追加と削除
@@ -52,6 +59,25 @@ el_Object.class.add("a");
 ```javascript
 el_Object.class.remove("a");
 ```
+
+# style の追加・変更と取得
+## スタイルの追加・変更
+```javascript
+el_Object.style.set("top","50px");
+```
+
+## 複数のスタイルを同時に追加・変更
+```javascript
+el_Object.style.MultiSet({
+    position:"absolute",
+    left:"5%",
+    top:"5%",
+    width:"10%",
+    height:"10%",
+    backgroundColor:"black"
+});
+```
+
 
 # remove 関数 - 要素の削除
 要素を削除します。
