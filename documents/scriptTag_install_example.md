@@ -18,7 +18,7 @@
     Ez.document.title.set("新しいタイトル")
     var el_Object = Ez.el("#a");
     el_Object.text.set("a");
-<script>
+</script>
 </html>
 ```
 
