@@ -1,6 +1,6 @@
 # npm を使用したインストール
 ```sh
-npm install -s @lp0ql/ez
+$ npm install -s @lp0ql/ez
 ```
 
 # JavaScriptで読み込み
