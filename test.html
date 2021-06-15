@@ -8,13 +8,135 @@
     <script src="./index.js"></script>
 </head>
 <body>
-    <div class="a"></div>    
+    <!-- <div class="a"></div>    
     <div class="a"></div>
     <div class="a b" style="position: fixed;left: 50%;"></div>
     <div class="a"></div>
-    <div class="a"></div>
+    <div class="a"></div> -->
 
+    <div id="box">
+        <div id="content"></div>
+    </div>
+
+    <style>
+        #box{
+            position: absolute;
+            top: 10%;
+            left:10%;
+            width: 80%;
+            height: 30%;
+            border: 5px black;
+            overflow: scroll;
+        }
+        #content{
+            position: absolute;
+            top:10%;
+            left:10% ;
+            width: 200%;
+            height: 40%;
+            background-color: aqua;       
+            }
+    </style>
     <script>
+        var from_start_point = "scrollLeft";
+        var all_scroll = "scrollWidth";
+        var content_size = "clientWidth";
+        var element = document.getElementById("box");
+        var speed = 1;
+        var end_keep = 1000;
+        var start_keep = 1000;
+        var re = false;
+        var scroll_end = true;
+        var move_switch = false;
+        var loop_switch = false;
+        var start_position = true;
+
+        function move_stop(){
+            move_switch = true;
+        };
+        function loop_stop(){
+            loop_switch = true;
+        };
+
+        
+        function reset(){
+            function reset_start_position(){
+                if(re){
+                    element[from_start_point] = element[all_scroll] - element[content_size];
+                }else{
+                    element[from_start_point] = 0;
+                };
+            };
+
+            setTimeout(function(){
+                if(loop_switch == true && start_position == true){
+                    reset_start_position();
+                };
+
+                if(loop_switch == false){
+                    reset_start_position();
+                    setTimeout(function(){
+                        scroll();
+                    },start_keep);
+                };
+            },end_keep);
+        };
+
+        
+        function scroll(Forecast/*予測されたスタート地点からのスクロール量*/){
+            if(move_switch == false){
+                if(Forecast){
+                    if(element[from_start_point] == Forecast){
+                        //予測された位置と現在の位置が一致
+
+                    }else{
+                        //スクロールを検出
+                        if(scroll_end){
+                            console.log("スクロールを検出した為、スクロールを終了しました。");
+                            move_stop();
+                            return;
+                        }else{
+                            console.log("スクロールを検出しましたが、スクロールで終了が設定されていないので続行します。")
+                        };
+                    };
+                };
+
+
+                var new_from_start_point_value;
+                if(re){
+                    new_from_start_point_value = element[from_start_point] - 1;
+                }else{
+                    new_from_start_point_value = element[from_start_point] + 1;
+                };
+
+                element[from_start_point] = new_from_start_point_value;
+
+                setTimeout(function(){
+
+
+                    var max_scroll = element[all_scroll] - element[content_size];
+                    var now_scroll = element[from_start_point];
+
+                    if(re){
+                        if(new_from_start_point_value < 1){
+                            reset();
+                        }else{
+                            scroll(new_from_start_point_value);
+                        };
+                    }else{
+                        if(max_scroll == new_from_start_point_value){
+                            reset();
+                        }else{
+                            scroll(new_from_start_point_value);
+                        };
+                    };
+                },speed);
+            };
+
+        };
+
+        scroll();
+
         // var box = Ez.el("#box");
         // box.text = "box_済"
         // var class_a = box.el(".a");
@@ -41,25 +163,24 @@
         //     console.log(Ez.document.ratio);
         // });
 
-        var class_b = Ez.el(".b");
+        // var class_b = Ez.el(".b");
 
-        class_b.style.MultiSet({
-            position:"absolute",
-            left:"5%",
-            top:"5%",
-            width:"10%",
-            height:"10%",
-            color:"white"
-        });
+        // class_b.style.MultiSet({
+        //     position:"absolute",
+        //     left:"5%",
+        //     top:"5%",
+        //     width:"10%",
+        //     height:"10%",
+        //     color:"white"
+        // });
 
-        class_b.style.set("backgroundColor","black");
+        // class_b.style.set("backgroundColor","black");
 
-        class_b.text.set("あいうえお");
+        // class_b.text.set("あいうえお");
 
-        Ez.document.title.set("aiueo");
+        // Ez.document.title.set("aiueo");
 
-        console.log(Ez.document.title.get());
-
+        // console.log(Ez.document.title.get());
 
 
     </script>

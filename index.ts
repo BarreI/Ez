@@ -5,6 +5,7 @@ console.log("Ezを読み込みました。");
  */
 const Ez = (function(){
 
+
     
 
     //画面がリサイズされた時のイベント
@@ -37,22 +38,183 @@ const Ez = (function(){
         convart:function(elements_array,path:string){
             //複数のスタイルを同時に設定する時に使用するオブジェクト
 
+            /**
+             * 自動スクロール関数の引数
+             */
+            interface scrollBar_auto {
+                /**
+                 * スクロールスピード
+                 */
+                speed?:number,
+                /**
+                 * ループ設定
+                 */
+                loop?:{
+                    /**
+                     * スクロールのループON/OFF切り替え
+                     */
+                    switch:boolean,
+                    /**
+                     * スクロール開始前に待機する時間
+                     */
+                    start_keep?:number,
+                    /**
+                     * スクロール終了状態で待機する時間
+                     */
+                    end_keep?:number,
+
+                },
+                /**
+                 * 終了時の設定
+                 */
+                end?:{
+                    time?:number,//時間経過で停止する場合設定
+                    touch?:boolean,//タッチした時に停止
+                    click?:boolean,//クリックした時に停止
+                    scroll?:boolean,//手動でスクロールされた時に停止
+                    /**
+                     * 停止後、自動的に初期地点に戻る
+                     */
+                    auto_back_to_start_point?:boolean,
+                }
+            };
+
             interface el_Object {
+                /**
+                 * パスを移動
+                 * @param {string} path - 移動先の設定 - 現在のパス（./)は不要 -../で上の階層へ
+                 */
                 el(path:string):el_Object,
+                /**
+                 * 要素の削除
+                 * - 現在、このオブジェクトに含まれている全ての要素を削除
+                 */
                 remove():void,
+                /**
+                 * クラスに関する設定
+                 * - クラスの追加
+                 * - クラスの削除
+                 */
                 class:{
+                    /**
+                     * クラスの追加
+                     * @param {string} class_name - 追加するクラス名
+                     */
                     add(class_name:string):void,
+                    /**
+                     * クラスの削除
+                     * @param {string} class_name - 削除するクラス名
+                     */
                     remove(class_name:string):void
                 },
+                /**
+                 * スタイルの設定
+                 */
                 style:{
+                    /**
+                     * スタイルの取得
+                     * @param {string} property_name - 取得したいプロパティ名(例：left) => 10px
+                     * @return {string}
+                     */
                     get(property_name:string):string,
+                    /**
+                     * スタイルの設定
+                     * @param property_name - 設定するプロパティ名 
+                     * @param value - 設定する値
+                     */
                     set(property_name:string,value:string|number):void
+                    /**
+                     * 複数のスタイルを同時に設定
+                     * @param {Object} settings 
+                     */
                     MultiSet(settings:{[keys:string]:string}):void
                 },
+                /**
+                 * テキストの設定
+                 */
                 text:{
+                    /**
+                     * 要素内に設定されているテキストを取得
+                     */
                     get():string | null,
+                    /**
+                     * 要素に設定されているテキストを更新
+                     * @param {string} value 
+                     */
                     set(value:string|number):void
                 },
+                /**
+                 * スクロールの設定
+                 */
+                scroll:{
+                    /**
+                     * スクロールバーの設定
+                     */
+                    bar:{
+                        /**
+                         * 縦スクロールバーと横スクロールバー
+                         */
+                        all:{
+                            /**
+                             * スクロールバーを非表示
+                             */
+                            hidden():void
+                        },
+                        /**
+                         * 縦スクロールバーの設定
+                         */
+                        Vertical:{
+                            /**
+                             * スクロールバーを非表示
+                             */
+                            hidden():void
+                        },
+                        /**
+                         * 横スクロールバーの設定
+                         */
+                        Horizontal:{
+                            /**
+                             * スクロールバーを非表示
+                             */
+                            hidden():void
+                        }
+                    },
+                    /**
+                     * 自動スクロールの設定
+                     */
+                    auto:{
+                        _scroll_control(from_start_point:"scrollLeft"|"scrollTop",all_scroll:"scrollWidth"|"scrollHeight",content_size:"clientWidth"|"contentHeight",reverse:boolean,settings:scrollBar_auto):("now"|"next_start"),
+                        /**
+                         * 縦に自動スクロール
+                         */
+                        Vertical:{
+                            /**
+                             * 上から下へ
+                             */
+                            top_to_bottom(settings:scrollBar_auto):("now"|"next_start"),
+                            /**
+                             * 下から上へ
+                             */
+                            bottom_to_top(settings:scrollBar_auto):("now"|"next_start")
+                        },
+                        /**
+                         * 横に自動スクロール
+                         */
+                        Horizontal:{
+                            /**
+                             * 右から左へ
+                             */
+                            right_to_left(settings:scrollBar_auto):("now"|"next_start"),
+                            /**
+                             * 左から右へ
+                             */
+                            left_to_right(settings:scrollBar_auto):("now"|"next_start")
+                        }
+                    }
+                },
+                /**
+                 * htmlのelement一覧
+                 */
                 raw:Element[],
                 id?:string | null,
 
@@ -185,8 +347,111 @@ const Ez = (function(){
                     }
                 },
                 /**
-                 * スタイルの設定
+                 * スクロール
                  */
+                scroll:{
+                    bar:{
+                        all:{
+                            hidden(){
+                                this.Vertical.hidden();
+                                this.Horizontal.hidden();
+                            }
+                        },
+                        Vertical:{
+                            hidden(){
+
+                            }
+                        },
+                        Horizontal:{
+                            hidden(){
+
+                            }
+                        } 
+                    },
+                    auto:{
+                        _scroll_control:function(
+                            from_start_point:"scrollLeft"|"scrollTop",
+                            all_scroll:"scrollWidth"|"scrollHeight",
+                            content_size:"clientWidth"|"contentHeight",
+                            reverse:boolean,//逆スクロール設定
+                            settings:scrollBar_auto
+                        ){
+                            let global_switch = [];
+
+                            elements_array.forEach(function(element,index){
+                                global_switch.push({
+                                    loop_stop_status:false,
+                                    move_stop_status:false,
+                                    loop_stop:function(){
+                                        global_switch[index].loop_stop_status = true;
+                                    },
+                                    move_stop:function(){
+                                        global_switch[index].move_stop_status = true;
+                                    }
+                                });
+
+    
+                                function reset(){
+                                    function reset_start_position(){
+                                        if(reverse){
+                                            element[from_start_point] = element[all_scroll] - element[content_size]
+                                        }else{
+                                            element[from_start_point] = 0;
+                                        };
+                                    };
+
+                                    setTimeout(function(){
+                                        if(settings.loop && settings.loop.switch == true){
+                                            reset_start_position();
+                                        };
+
+                                        if(settings.loop && settings.loop.switch == false){
+                                            reset_start_position();
+                                            setTimeout(function(){
+                                                scroll();
+                                            },settings.loop.start_keep);
+                                        };
+                                    },settings.loop.end_keep);
+                                };
+    
+                                function scroll(Forecast:number|void){
+    
+                                };
+    
+                                scroll();
+                            });
+                            
+                            return function(end:"now"|"next_start"){
+                                //すべてのスクロールに対して停止を設定
+                                global_switch.forEach(settings_obj => {
+                                    if(end == "next_start"){
+                                        settings_obj.loop_stop();
+                                    }else if(end == "now"){
+                                        settings_obj.move_stop();
+                                    };   
+                                });
+                            };
+                        };
+
+                        },
+                        Vertical:{
+                            top_to_bottom:function(){
+
+                            },
+                            bottom_to_top:function(){
+
+                            }
+                        },
+                        Horizontal:{
+                            left_to_right:function(){
+
+                            },
+                            right_to_left:function(){
+
+                            }
+                        }
+                    }
+                }
             };
 
             //idの設定
