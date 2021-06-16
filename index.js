@@ -30,6 +30,7 @@ var Ez = (function () {
         convart: function (elements_array, path) {
             //複数のスタイルを同時に設定する時に使用するオブジェクト
             ;
+            ;
             var re = {
                 /**
                  * 要素内で要素を検索 or 親要素へ移動
@@ -152,6 +153,224 @@ var Ez = (function () {
                         elements_array.forEach(function (element) {
                             element.classList.remove(class_name);
                         });
+                    }
+                },
+                /**
+                 * スクロール
+                 */
+                scroll: {
+                    auto: {
+                        _scroll_control: function (from_start_point, all_scroll, content_size, reverse, settings) {
+                            //未設定の初期値を設定　
+                            (function () {
+                                //スクロールのスピード
+                                if (!settings.speed) {
+                                    settings.speed = 14;
+                                }
+                                ;
+                                //スクロール検知時の感度
+                                if (!settings.end.tolerance) {
+                                    settings.end.tolerance = 10;
+                                }
+                                ;
+                                //スクロール開始前の待機時間
+                                if (settings.loop && !settings.loop.start_keep) {
+                                    settings.loop.start_keep = 1000;
+                                }
+                                ;
+                                //スクロール終了時の待機時間
+                                if (settings.loop && !settings.loop.end_keep) {
+                                    settings.loop.end_keep = 1000;
+                                }
+                                ;
+                            })();
+                            var global_switch = [];
+                            elements_array.forEach(function (element, index) {
+                                global_switch.push({
+                                    loop_stop_status: 0,
+                                    move_stop_status: 0,
+                                    loop_stop: function () {
+                                        global_switch[index].loop_stop_status++;
+                                        if (settings.end.auto_restart) {
+                                            setTimeout(function () {
+                                                global_switch[index].move_stop_status--;
+                                                scroll();
+                                            }, settings.end.auto_restart);
+                                        }
+                                        ;
+                                    },
+                                    move_stop: function () {
+                                        global_switch[index].move_stop_status++;
+                                        //停止時に初期値に戻る設定がされている場合
+                                        if (settings.end && settings.end.auto_back_to_start_point == true) {
+                                            reset();
+                                        }
+                                        ;
+                                        if (settings.end.auto_restart) {
+                                            setTimeout(function () {
+                                                global_switch[index].move_stop_status--;
+                                                scroll();
+                                            }, settings.end.auto_restart);
+                                        }
+                                        ;
+                                    }
+                                });
+                                function reset() {
+                                    function reset_start_position() {
+                                        if (reverse) {
+                                            element[from_start_point] = element[all_scroll] - element[content_size];
+                                        }
+                                        else {
+                                            element[from_start_point] = 0;
+                                        }
+                                        ;
+                                    }
+                                    ;
+                                    setTimeout(function () {
+                                        if (settings.loop) {
+                                            reset_start_position();
+                                            setTimeout(function () {
+                                                scroll();
+                                            }, settings.loop.start_keep);
+                                        }
+                                        ;
+                                    }, settings.loop.end_keep);
+                                }
+                                ;
+                                function scroll(Forecast) {
+                                    if (global_switch[index].move_stop_status == 0) {
+                                        if (Forecast) {
+                                            //予測位置と同じ（+- settings.end.toleranceまで許容)
+                                            if (element[from_start_point] == Forecast || (element[from_start_point] < Forecast + settings.end.tolerance && element[from_start_point] > Forecast - settings.end.tolerance)) {
+                                                //予測された位置と同じ
+                                            }
+                                            else {
+                                                //スクロールされた場合
+                                                if (settings.end && settings.end.scroll) {
+                                                    console.log("スクロールを検出した為停止しました。 予測：" + Forecast + " 実際:" + element[from_start_point]);
+                                                    global_switch[index].move_stop();
+                                                    return;
+                                                }
+                                                else {
+                                                    console.warn("スクロールを検出しましたが、スクロール時に停止する設定がされていない為、スクロールを継続します。");
+                                                }
+                                                ;
+                                            }
+                                            ;
+                                        }
+                                        ;
+                                        var new_from_start_point_value;
+                                        var old_from_start_point_value = Math.floor(element[from_start_point]);
+                                        if (reverse) {
+                                            new_from_start_point_value = Math.floor(element[from_start_point]) - 1;
+                                        }
+                                        else {
+                                            new_from_start_point_value = Math.floor(element[from_start_point]) + 1;
+                                        }
+                                        ;
+                                        element[from_start_point] = new_from_start_point_value;
+                                        setTimeout(function () {
+                                            var max_scroll = element[all_scroll] - element[content_size];
+                                            if (reverse) {
+                                                if (new_from_start_point_value == old_from_start_point_value) {
+                                                    reset();
+                                                }
+                                                else {
+                                                    scroll(new_from_start_point_value);
+                                                }
+                                                ;
+                                            }
+                                            else {
+                                                if (Math.floor(max_scroll) == old_from_start_point_value) {
+                                                    reset();
+                                                }
+                                                else {
+                                                    scroll(new_from_start_point_value);
+                                                }
+                                                ;
+                                            }
+                                            ;
+                                        }, settings.speed);
+                                    }
+                                    ;
+                                }
+                                ;
+                                //各種イベント設定
+                                (function () {
+                                    //クリックで終了が設定されてる時
+                                    if (settings.end.click && settings.end.click == true) {
+                                        element.addEventListener("mousedown", function () {
+                                            global_switch[index].move_stop();
+                                        });
+                                    }
+                                    ;
+                                    //タッチで終了が設定されている時
+                                    if (settings.end.click && settings.end.click == true) {
+                                        element.addEventListener("touchdown", function () {
+                                            global_switch[index].move_stop();
+                                        });
+                                    }
+                                    ;
+                                    //スクロールで終了が設定されている時
+                                    if (settings.end.scroll && settings.end.scroll == true) {
+                                        element.addEventListener("wheel", function (e) {
+                                            if (from_start_point == "scrollLeft") {
+                                                //横スクロールの時
+                                                if (e.shiftKey == true) {
+                                                    global_switch[index].move_stop();
+                                                }
+                                                ;
+                                            }
+                                            else {
+                                                //縦スクロールの時
+                                                if (e.shiftKey == false) {
+                                                    global_switch[index].move_stop();
+                                                }
+                                                ;
+                                            }
+                                            ;
+                                        });
+                                    }
+                                    ;
+                                    //タイマーで終了が設定されている時
+                                    if (settings.end.time) {
+                                        setTimeout(function () {
+                                            global_switch[index].move_stop();
+                                        }, settings.end.time);
+                                    }
+                                    ;
+                                })();
+                                scroll();
+                            });
+                            return function (end) {
+                                //すべてのスクロールに対して停止を設定
+                                global_switch.forEach(function (settings_obj) {
+                                    if (end == "next_start") {
+                                        settings_obj.loop_stop();
+                                    }
+                                    else if (end == "now") {
+                                        settings_obj.move_stop();
+                                    }
+                                    ;
+                                });
+                            };
+                        },
+                        Vertical: {
+                            top_to_bottom: function (settings) {
+                                return re.scroll.auto._scroll_control("scrollTop", "scrollHeight", "clientHeight", false, settings);
+                            },
+                            bottom_to_top: function (settings) {
+                                return re.scroll.auto._scroll_control("scrollTop", "scrollHeight", "clientHeight", true, settings);
+                            }
+                        },
+                        Horizontal: {
+                            left_to_right: function (settings) {
+                                return re.scroll.auto._scroll_control("scrollLeft", "scrollWidth", "clientWidth", true, settings);
+                            },
+                            right_to_left: function (settings) {
+                                return re.scroll.auto._scroll_control("scrollLeft", "scrollWidth", "clientWidth", false, settings);
+                            }
+                        }
                     }
                 }
             };

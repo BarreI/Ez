@@ -80,21 +80,9 @@ el_Object.style.MultiSet({
 
 # scrollの設定 - オブジェクト
 
-## bar - スクロールバー設定
-    
- - [all](./scroll/scroll_bar.md) - 縦・横 両方のスクロールバーに設定
- - [Vertical](./scroll/scroll_bar.md) - 縦のスクロールバーに設定
- - [Horizontal](./scroll/scroll_bar.md) - 横のスクロールバーに設定
-
- ```javascript
-el_Object.scroll.bar.all
-el_Object.scroll.bar.Vertical
-el_Object.scroll.bar.Horizontal
- ```
-
 ## auto - 自動スクロールの設定
 
-### Vertical - 縦のスクロールバーに設定
+### Vertical - 縦のスクロールを設定
 
  - top_to_bottom([引数の設定を見る](./scroll/auto.md)) 上から下へ 
  - bottom_to_top([引数の設定を見る](./scroll/auto.md)) 下から上へ
@@ -104,7 +92,7 @@ el_Object.scroll.auto.Vertical.top_to_bottom
 el_Object.scroll.auto.Vertical.bottom_to_top
  ```
 
-### Horizontal - 横のスクロールバーに設定
+### Horizontal - 横のスクロールを設定
 
  - right_to_left([引数の設定を見る](./scroll/auto.md)) 右から左へ 
  - left_to_right([引数の設定を見る](./scroll/auto.md)) 左から右へ

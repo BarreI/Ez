@@ -33,10 +33,42 @@
             top:10%;
             left:10% ;
             width: 200%;
-            height: 40%;
+            height: 200%;
             background-color: aqua;       
             }
     </style>
+
+    <script>
+        Ez.el("#box").scroll.auto.Vertical.top_to_bottom({
+            speed:10,
+            loop:{
+                switch:true,
+                start_keep:1000,
+                end_keep:1000
+            },
+            end:{
+                scroll:true,
+                click:true,
+
+                auto_back_to_start_point:false
+            },
+
+        })
+
+        Ez.el("#box").scroll.auto.Horizontal.right_to_left({
+            speed:10,
+            loop:{
+            },
+            end:{
+                scroll:true,
+                click:true,
+                auto_restart:2000,
+                auto_back_to_start_point:false
+            },
+
+        })
+    </script>
+    <!---
     <script>
         var from_start_point = "scrollLeft";
         var all_scroll = "scrollWidth";
@@ -184,5 +216,6 @@
 
 
     </script>
+    -->
 </body>
 </html>
