@@ -3,7 +3,8 @@ tsc index.ts
 echo Convarted
 
 jsonData=`cat package.json`
-version=$(echo $jsonData | jq '.version' | sed 's/^.*"\(.*\)".*$/\1/')
+version=$(echo $jsonData | jq '.version' | sed 's/^.*"\(.*\)".*$/\1/' | tr -d .)
+version=$((version + 1))
 echo $version
 
 echo copying to docs
