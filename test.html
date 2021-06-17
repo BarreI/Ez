@@ -38,34 +38,37 @@
             }
     </style>
 
+
+
+    <div id="obj"></div>
+    <style>
+        #obj{
+            position: absolute;
+            background-color: aquamarine;
+            top:50%;
+            left:10%;
+            width: 50%;
+            height: 20%;
+        }
+    </style>
     <script>
-        Ez.el("#box").scroll.auto.Vertical.top_to_bottom({
-            speed:10,
-            loop:{
-                switch:true,
-                start_keep:1000,
-                end_keep:1000
-            },
-            end:{
-                scroll:true,
-                click:true,
+        Ez.el("#obj").drug_and_drop({
+            events:{
+                drug:function(location){{
+                    console.log("開始")
+                }},
+                drop:function(location){
+                    console.log("終了")
 
-                auto_back_to_start_point:false
-            },
+                },
+                move:function(location){
+                    console.log("移動 " + location.moved.x + " & " + location.moved.y)
 
-        })
-
-        Ez.el("#box").scroll.auto.Horizontal.right_to_left({
-            speed:10,
-            loop:{
-            },
-            end:{
-                scroll:true,
-                click:true,
-                auto_restart:2000,
-                auto_back_to_start_point:false
-            },
-
+                },
+                cancel:function(location){
+                    console.log("キャンセル")
+                }
+            }
         })
     </script>
     <!---

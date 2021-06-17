@@ -102,18 +102,6 @@ el_Object.scroll.auto.Horizontal.right_to_left
 el_Object.scroll.auto.Horizontal.left_to_right
  ```
 
-# drug_and_drop - ドラッグ&ドロップができるようにします。
-<span style="color:red;">注意：el_Objectのターゲットが1つである必要があります。</span>
-例えば、``Ez.el(".a")``のようにして、クラスaが複数ある場合はエラーが発生します。
-
-[引数の配列には何を設定すれば良いですか？](./drug_and_drop/input_object.md)
-
-```javascript
-Ez.el("#obj").drug_and_drop({
-
-})
-```
-
 # remove 関数 - 要素の削除
 要素を削除します。
 ```javascript
