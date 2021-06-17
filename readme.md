@@ -9,7 +9,7 @@ EzはJSから簡単にHTMLを操作する為のライブラリです。
 # [ドキュメントを見る](./docs/documents/index.md)
 
 # フォルダの説明
-
+```
 Ez
 |_ index.ts - 次のバージョンの ts ファイル
 |_ index.js - 次のバージョンの js ファイル
@@ -26,3 +26,4 @@ Ez
 |  |_ versions - バージョン毎の js & ts ファイルとドキュメント
 |  |_ index.js - 現在のバージョンの js ファイル
 |  |_ index.ts - 現在のバージョンの ts ファイル
+```
