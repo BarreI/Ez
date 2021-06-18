@@ -17,4 +17,4 @@ mkdir docs/beta
 cp index.js docs/beta/index.js
 cp index.ts docs/beta/index.ts
 
-cp ./test.html ./docs/beta/test.html
+cp test.html docs/beta/test.html
