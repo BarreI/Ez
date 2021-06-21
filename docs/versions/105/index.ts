@@ -109,21 +109,14 @@ const Ez = (function(){
                 }
             };
 
+
             /**
-             * ドラッグ&ドロップ関数の引数
+             * イベントの削除オブジェクト
              */
-            interface drug_and_drop {
-                only?:"mouse"|"touch",
-                get_only?:boolean,
-                events?:{
-                    drug?:(location:swipe_location,remove_event:()=>void)=>void,
-                    drop?:(location:swipe_location,remove_event:()=>void)=>void,
-                    move?:(location:swipe_location,remove_event:()=>void)=>void,
-                    cancel?:(Location:swipe_location,remove_event:()=>void)=>void
-                }
-
+            interface click_remove_event_interface {
+                this_event:()=>void,
+                all_events:()=>void
             };
-
 
 
             interface el_Object {
@@ -235,30 +228,25 @@ const Ez = (function(){
                     }
                 },
                 /**
-                 * オブジェクトをドラック&ドロップできるようにする
-                 */
-                drug_and_drop(settings:drug_and_drop):void,
-                /**
                  * クリックとタップの処理
                  */
                 click(settings:{                    
-                    click?:(x:number,y:number)=>void,
-                    tap?:(x:number,y:number)=>void,
+                    click?:(x:number,y:number,remove_event:click_remove_event_interface)=>void,
+                    tap?:(x:number,y:number,remove_event:click_remove_event_interface)=>void,
                     stop_propagation?:boolean,
-                    allowable_move?:number,
                     right_click?:{
-                        on_event:(x:number,y:number)=>void
+                        on_event:(x:number,y:number,remove_event:click_remove_event_interface)=>void,
                     },
                     long_click?:{
-                        on_event:(x:number,y:number)=>void,
+                        on_event:(x:number,y:number,remove_event:click_remove_event_interface)=>void,
                         duration:number,
                     },
                     long_tap?:{
-                        on_event:(x:number,y:number)=>void,
+                        on_event:(x:number,y:number,remove_event:click_remove_event_interface)=>void,
                         duration:number
                     },
                     double_click?:{
-                        on_event:(locations:swipe_location)=>void,
+                        on_event:(locations:swipe_location,remove_event:click_remove_event_interface)=>void,
                         duration:number,
                         times:number,
                     },
@@ -268,11 +256,15 @@ const Ez = (function(){
                     //     times:number
                     // },
                     move?:{
-                        on_event:(location:swipe_location)=>void,
+                        on_event:(location:swipe_location,remove_event:click_remove_event_interface)=>void,
                     },
                     cancel?:{
-                        on_event:(location:swipe_location)=>void
-                    }
+                        on_event:(location:swipe_location,remove_event:click_remove_event_interface)=>void
+                    },
+                    /**
+                     * すべての一連のプロセスが終了した時に実行されます。
+                     */
+                    ended?:(location:swipe_location,remove_event:click_remove_event_interface)=>void
                 }):void
                 /**
                  * htmlのelement一覧
@@ -628,208 +620,29 @@ const Ez = (function(){
                         
                     }
                 },
-                drug_and_drop:function(settings:drug_and_drop):void{
-                    if(!(elements_array.length == 1)){
-                    console.error("このel_Objectが対象としている要素は1つではありません。drug_and_drop設定は要素が1つの時に設定できます。");
-                    return;
-                    };
-
-                    let element = elements_array[0];
-
-                    interface Status_interface {
-                        mouse:{
-                            hover:boolean,
-                            click:boolean
-                        },
-                        touch:{
-                            target:boolean,
-                            id:any
-                        },
-                        location:swipe_location,
-                        default_element_location:{
-                            x:null | number,
-                            y:null | number
-                        }
-                    }
-
-                    let status:Status_interface;
-                    
-                    
-                    const Events = {
-                        start:function(e){
-                            console.log(e)
-                            if(status.touch.target == true){
-                                status.location.start.x = e.touches[0].clientX;
-                                status.location.end.x = e.touches[0].clientX;
-                                status.location.start.y = e.touches[0].clientY;
-                                status.location.end.y = e.touches[0].clientY;
-                            }else{
-                                status.location.start.x = e.clientX;
-                                status.location.end.x = e.clientX;
-                                status.location.start.y = e.clientY;
-                                status.location.end.y = e.clientY;
-                            };
-
-                            if(!settings.get_only){
-                                status.default_element_location = {
-                                    x:element.offsetLeft,
-                                    y:element.offsetTop
-                                }
-                            };
-
-                            if(settings.events && settings.events.drop){
-                                settings.events.drug(status.location,addEventListeners.remove);
-                            };
-                        },
-                        move:function(e){
-                            if(status.touch.target == true){
-                                status.location.end.x = e.touches[0].clientX;
-                                status.location.end.y = e.touches[0].clientY;
-                            }else{
-                                status.location.end.x = e.clientX;
-                                status.location.end.y = e.clientY;
-                            };
-
-
-                            status.location.moved = {
-                                x:(status.location.start.x - status.location.end.x)* -1,
-                                y:(status.location.start.y - status.location.end.y)* -1
-                            };
-
-                            if(!settings.get_only){
-                                element.style.left = status.default_element_location.x + status.location.moved.x + "px";
-                                element.style.top = status.default_element_location.y + status.location.moved.y + "px";
-                            };
-
-                            if(settings.events && settings.events.move){
-                                settings.events.move(status.location,addEventListeners.remove);
-                            };
-                        },
-                        end:function(e){
-                            if(settings.events && settings.events.drop){
-                                settings.events.drop(status.location,addEventListeners.remove);
-                            };
-                            Events.reset_status();
-                        },
-                        cancel:function(e){
-                            if(settings.events && settings.events.cancel){
-                                settings.events.cancel(status.location,addEventListeners.remove);
-                            };
-                            Events.reset_status();
-                        },
-                        reset_status:function(){
-                            console.log(status);
-                            status = {
-                                mouse:{
-                                    hover:false,
-                                    click:false
-                                },
-                                touch:{
-                                    target:false,
-                                    id:null
-                                },
-                                location:{
-                                    start:{
-                                        x:null,
-                                        y:null
-                                    },
-                                    end:{
-                                        x:null,
-                                        y:null
-                                    }
-                                },
-                                default_element_location:{
-                                    x:null,
-                                    y:null
-                                }
-                            }
-                        }
-                    };
-                    
-                    Events.reset_status();
-                    const to_document_events = [
-                        "mousemove",
-                        "mouseup",
-                        "mousecancel",
-                        "touchmove",
-                        "touchend",
-                        "touchcancel"
-                    ];
-                    const to_element_events = [
-                        "mousedown",
-                        "touchstart"
-                    ];
-                    const addEventListeners = {
-                        document_mousemove(e){
-                            if(status.mouse.click == true){
-                                Events.move(e);
-                            };
-                        },
-                        document_mouseup(e){
-                            if(status.mouse.click == true){
-                                Events.end(e);
-                            };
-                        },
-                        document_mousecancel(e){
-                            if(status.mouse.click == true){
-                                Events.cancel(e);
-                            };
-                        },
-                        element_mousedown(e){
-                            if(status.touch.target == false){
-                                status.mouse.click = true;
-                                Events.start(e);
-                            };
-                        },
-                        
-                        document_touchmove(e){
-                            if(status.touch.target == true){
-                                Events.move(e);
-                            };
-                        },
-                        document_touchend(e){
-                            if(status.touch.target == true){
-                                Events.end(e);
-                            };
-                        },
-                        document_touchcancel(e){
-                            if(status.touch.target == true){
-                                Events.cancel(e);
-                            };
-                        },
-                        element_touchstart(e){
-                            console.log("touch_start")
-                            if(status.mouse.click == false){
-                                status.touch.target = true;
-                                status.touch.id = e.touches[0]
-                                Events.start(e);
-                            };
-                        },
-                        set(){//すべてのイベントを設定する
-                            to_document_events.forEach(event_name => {
-                                document.documentElement.addEventListener(event_name,addEventListeners["document_" + event_name])
-                            });
-                            to_element_events.forEach(event_name => {
-                                element.addEventListener(event_name,addEventListeners["element_" + event_name])
-                            });
-                        },
-                        remove(){//全てのイベントを解除する
-                            to_document_events.forEach(event_name => {
-                                document.documentElement.removeEventListener(event_name,addEventListeners["document_" + event_name])
-                            });
-                            to_element_events.forEach(event_name => {
-                                element.removeEventListener(event_name,addEventListeners["element_" + event_name])
-                            });
-                        }
-                    };
-
-                    addEventListeners.set();
-
-                },
                 click:function(settings){
-                    let global_events = [];
+                    //各要素のイベント削除用の関数配列
+                    let global_remove_events = [];
 
                     elements_array.forEach(function(element){
+
+                        //イベント設定の解除に使用するオブジェクト
+                        const click_remove_event_object:click_remove_event_interface = {
+                            all_events:function(){
+                                global_remove_events.forEach(fnc => {
+                                    fnc();
+                                });
+                            },
+                            this_event:function(){
+                                Object.keys(EventListeners).forEach(function(event_name){
+                                    if(event_name == "mousedown" || event_name == "touchstart" || event_name == "contextmenu"){
+                                        element.removeEventListener(event_name,EventListeners[event_name]);
+                                    }else{
+                                        document.documentElement.removeEventListener(event_name,EventListeners[event_name]);
+                                    };
+                                });
+                            }
+                        };
 
                         interface Status{
                             type:"mouse"|"touch"|null,
@@ -868,6 +681,10 @@ const Ez = (function(){
                         let input_style_is_tap:number = 0;
 
                         function reset_status(){
+                            if(settings.ended){
+                                settings.ended(status.location,click_remove_event_object);
+                            };
+
                             status = {
                                 type:null,
                                 location:{
@@ -895,9 +712,9 @@ const Ez = (function(){
                                 status.time.start = performance.now(); 
                                 Event_functions.long(mode);
                             },
-                            right_click:function(){
+                            right_click:function(e){
                                 if(settings.right_click && settings.right_click.on_event){
-                                    settings.right_click.on_event(status.location.start.x,status.location.start.y)
+                                    settings.right_click.on_event(e.clientX,e.clientY,click_remove_event_object)
                                 };
                             },
                             end:function(mode:"click"|"tap"){
@@ -916,7 +733,7 @@ const Ez = (function(){
                                         if(settings["long_" + mode] && status.time.end - status.time.start > settings["long_" + mode].duration){
                                             //settings.long_click.on_event(status.location.end.x,status.location.end.y)
                                         }else{
-                                            settings[mode](status.location.end.x,status.location.end.y);
+                                            settings[mode](status.location.end.x,status.location.end.y,click_remove_event_object);
                                         };
                                     };
                                 };
@@ -924,11 +741,12 @@ const Ez = (function(){
                             //ロングクリック&タップ処理
                             long:function(mode:"click"|"tap"){
                                 if(settings["long_" + mode] && settings["long_" + mode].on_event){
-                                    long_click_status = status.time.start;
+                                    const long_click_start_status = status.time.start;
+                                    const long_click_end_status = status.time.end;
 
                                     setTimeout(function(){
-                                        if(long_click_status == status.time.start){
-                                            settings["long_" + mode].on_event(status.location.start.x,status.location.start.y);
+                                        if(long_click_start_status == status.time.start && long_click_end_status == status.time.end){
+                                            settings["long_" + mode].on_event(status.location.start.x,status.location.start.y,click_remove_event_object);
                                         };
                                     },settings["long_" + mode].duration);
                                 };
@@ -940,14 +758,14 @@ const Ez = (function(){
                                 };
 
                                 if(settings.move && settings.move.on_event){
-                                    settings.move.on_event(status.location);
+                                    settings.move.on_event(status.location,click_remove_event_object);
                                 };
                             },
                             double:function(mode:"click"|"tap"){
                                 if(settings["double_" + mode ] && settings["double_" + mode].on_event){
                                     status.times++;
                                     if(status.times + 0 == settings["double_" + mode].times){
-                                        settings["double_" + mode].on_event(status.location);
+                                        settings["double_" + mode].on_event(status.location,click_remove_event_object);
                                         reset_status();
                                     }else{
                                         const tmp_time_keeper = status.time.start;
@@ -964,28 +782,35 @@ const Ez = (function(){
                             cancel:function(){
                                 if(settings.cancel && settings.cancel.on_event){
                                     status.can_move = false;
-                                    settings.cancel.on_event(status.location);
+                                    settings.cancel.on_event(status.location,click_remove_event_object);
                                     reset_status();
                                 }
                             }
                         };
 
+                        function stop_propagation_check(e){
+                            if(settings.stop_propagation && settings.stop_propagation == true){
+                                e.stopPropagation();
+                            };
+                        };
                         //イベントリスト
                         const EventListeners = {
                             mousedown(e){
+                                stop_propagation_check(e);
                                 if(status.type == null && input_style_is_tap == 0){
                                     status.type = "mouse";
                                     status.location.start.x = e.clientX;
                                     status.location.start.y = e.clientY;
-
+                                    
                                     if(e.button == 0){
                                         Event_functions.start("click");
                                     }else if(e.button == 2){
-                                        Event_functions.right_click();
+                                        Event_functions.right_click(e);
                                     };
                                 };
                             },
                             mouseup(e){
+                                stop_propagation_check(e);
                                 if(status.type == "mouse"){
                                     status.location.end.x = e.clientX;
                                     status.location.end.y = e.clientY;
@@ -993,6 +818,7 @@ const Ez = (function(){
                                 };
                             },
                             mousecancel(e){
+                                stop_propagation_check(e);
                                 if(status.type == "mouse"){
                                     status.location.end.x = e.clientX;
                                     status.location.end.y = e.clientY;
@@ -1000,13 +826,15 @@ const Ez = (function(){
                                 };
                             },
                             mousemove(e){
-                                if(status.type == "mouse" && settings.move && settings.move.on_event && status.can_move == true){
+                                stop_propagation_check(e);
+                                if(status.type == "mouse" && status.can_move == true){
                                     status.location.end.x = e.clientX;
                                     status.location.end.y = e.clientY;
                                     Event_functions.move("click");
                                 };
                             },
                             touchstart(e){
+                                stop_propagation_check(e);
                                 if(status.type == null){
                                     input_style_is_tap++;
                                     setTimeout(function(){
@@ -1019,11 +847,13 @@ const Ez = (function(){
                                 };
                             },
                             contextmenu(e){
+                                stop_propagation_check(e);
                                 if(settings.long_tap || settings.right_click){
                                     e.preventDefault();
                                 };
                             },
                             touchend(e){
+                                stop_propagation_check(e);
                                 if(status.type == "touch"){
                                     status.location.end.x = e.changedTouches[0].clientX;
                                     status.location.end.y = e.changedTouches[0].clientY;
@@ -1031,6 +861,7 @@ const Ez = (function(){
                                 };
                             },
                             touchcancel(e){
+                                stop_propagation_check(e);
                                 if(status.type == "touch"){
                                     status.location.end.x = e.touches[0].clientX;
                                     status.location.end.y = e.touches[0].clientY;
@@ -1038,7 +869,8 @@ const Ez = (function(){
                                 };
                             },
                             touchmove(e){
-                                if(status.type == "touch" && settings.move && settings.move.on_event && status.can_move == true){
+                                stop_propagation_check(e);
+                                if(status.type == "touch" && status.can_move == true){
                                     status.location.end.x = e.touches[0].clientX;
                                     status.location.end.y = e.touches[0].clientY;
                                     Event_functions.move("tap");
@@ -1047,7 +879,7 @@ const Ez = (function(){
                         };
 
                         //後でキャンセルできるようにglobal_events配列に設定
-                        global_events.push(EventListeners);
+                        global_remove_events.push(click_remove_event_object.this_event);
 
                         //イベントリスナーの設定
                         Object.keys(EventListeners).forEach(event_name => {
@@ -1058,20 +890,6 @@ const Ez = (function(){
                             };
                         });
                     });
-
-
-                    //イベントリスナーの削除関数
-                    return function(){
-                        elements_array.array.forEach(function(element,index){
-                            global_events[index].forEach(function(event_name){
-                                if(event_name == "mousedown" || event_name == "touchstart"){
-                                    element.removeEventListener(event_name,global_events[index][event_name]);
-                                }else{
-                                    document.documentElement.removeEventListener(event_name,global_events[index][event_name]);
-                                };
-                            });
-                        });
-                    };
           
                     
                 }
