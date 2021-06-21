@@ -18,6 +18,9 @@ case $ANS in
     case $ANS_2 in 
     [Yy]*)
         sh ready.sh
+        cp index.ts docs/index.ts
+        cp index.js docs/index.js
+        cp -r documents docs/documents
         clear
         echo "公開中..."
         npm publish

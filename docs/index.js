@@ -31,6 +31,8 @@ var Ez = (function () {
             //複数のスタイルを同時に設定する時に使用するオブジェクト
             ;
             ;
+            ;
+            ;
             var re = {
                 /**
                  * 要素内で要素を検索 or 親要素へ移動
@@ -372,6 +374,282 @@ var Ez = (function () {
                             }
                         }
                     }
+                },
+                click: function (settings) {
+                    //各要素のイベント削除用の関数配列
+                    var global_remove_events = [];
+                    elements_array.forEach(function (element) {
+                        //イベント設定の解除に使用するオブジェクト
+                        var click_remove_event_object = {
+                            all_events: function () {
+                                global_remove_events.forEach(function (fnc) {
+                                    fnc();
+                                });
+                            },
+                            this_event: function () {
+                                Object.keys(EventListeners).forEach(function (event_name) {
+                                    if (event_name == "mousedown" || event_name == "touchstart" || event_name == "contextmenu") {
+                                        element.removeEventListener(event_name, EventListeners[event_name]);
+                                    }
+                                    else {
+                                        document.documentElement.removeEventListener(event_name, EventListeners[event_name]);
+                                    }
+                                    ;
+                                });
+                            }
+                        };
+                        ;
+                        var status = {
+                            type: null,
+                            location: {
+                                start: {
+                                    x: null,
+                                    y: null
+                                },
+                                end: {
+                                    x: null,
+                                    y: null
+                                }
+                            },
+                            time: {
+                                start: null,
+                                end: null
+                            },
+                            times: 0,
+                            can_move: true
+                        };
+                        //ロングクリック用にクリック開始時間を保存する
+                        var long_click_status = 0;
+                        var input_style_is_tap = 0;
+                        function reset_status() {
+                            if (settings.ended) {
+                                settings.ended(status.location, click_remove_event_object);
+                            }
+                            ;
+                            status = {
+                                type: null,
+                                location: {
+                                    start: {
+                                        x: null,
+                                        y: null
+                                    },
+                                    end: {
+                                        x: null,
+                                        y: null
+                                    }
+                                },
+                                time: {
+                                    start: null,
+                                    end: null
+                                },
+                                times: 0,
+                                can_move: true
+                            };
+                        }
+                        ;
+                        var Event_functions = {
+                            start: function (mode) {
+                                status.time.start = performance.now();
+                                Event_functions.long(mode);
+                            },
+                            right_click: function (e) {
+                                if (settings.right_click && settings.right_click.on_event) {
+                                    settings.right_click.on_event(e.clientX, e.clientY, click_remove_event_object);
+                                }
+                                ;
+                            },
+                            end: function (mode) {
+                                status.time.end = performance.now();
+                                long_click_status = 0;
+                                status.can_move = false;
+                                Event_functions.normal(mode);
+                                Event_functions.double(mode);
+                            },
+                            //通常クリック&タップ処理
+                            normal: function (mode) {
+                                if (settings[mode]) {
+                                    if (!status.location.moved) {
+                                        if (settings["long_" + mode] && status.time.end - status.time.start > settings["long_" + mode].duration) {
+                                            //settings.long_click.on_event(status.location.end.x,status.location.end.y)
+                                        }
+                                        else {
+                                            settings[mode](status.location.end.x, status.location.end.y, click_remove_event_object);
+                                        }
+                                        ;
+                                    }
+                                    ;
+                                }
+                                ;
+                            },
+                            //ロングクリック&タップ処理
+                            long: function (mode) {
+                                if (settings["long_" + mode] && settings["long_" + mode].on_event) {
+                                    var long_click_start_status_1 = status.time.start;
+                                    var long_click_end_status_1 = status.time.end;
+                                    setTimeout(function () {
+                                        if (long_click_start_status_1 == status.time.start && long_click_end_status_1 == status.time.end) {
+                                            settings["long_" + mode].on_event(status.location.start.x, status.location.start.y, click_remove_event_object);
+                                        }
+                                        ;
+                                    }, settings["long_" + mode].duration);
+                                }
+                                ;
+                            },
+                            move: function (mode) {
+                                status.location.moved = {
+                                    x: (status.location.start.x - status.location.end.x) * -1,
+                                    y: (status.location.start.y - status.location.end.y) * -1
+                                };
+                                if (settings.move && settings.move.on_event) {
+                                    settings.move.on_event(status.location, click_remove_event_object);
+                                }
+                                ;
+                            },
+                            double: function (mode) {
+                                if (settings["double_" + mode] && settings["double_" + mode].on_event) {
+                                    status.times++;
+                                    if (status.times + 0 == settings["double_" + mode].times) {
+                                        settings["double_" + mode].on_event(status.location, click_remove_event_object);
+                                        reset_status();
+                                    }
+                                    else {
+                                        var tmp_time_keeper_1 = status.time.start;
+                                        setTimeout(function () {
+                                            if (tmp_time_keeper_1 == status.time.start) {
+                                                reset_status();
+                                            }
+                                            ;
+                                        }, settings["double_" + mode].duration);
+                                    }
+                                    ;
+                                }
+                                else {
+                                    reset_status();
+                                }
+                                ;
+                            },
+                            cancel: function () {
+                                if (settings.cancel && settings.cancel.on_event) {
+                                    status.can_move = false;
+                                    settings.cancel.on_event(status.location, click_remove_event_object);
+                                    reset_status();
+                                }
+                            }
+                        };
+                        function stop_propagation_check(e) {
+                            if (settings.stop_propagation && settings.stop_propagation == true) {
+                                e.stopPropagation();
+                            }
+                            ;
+                        }
+                        ;
+                        //イベントリスト
+                        var EventListeners = {
+                            mousedown: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == null && input_style_is_tap == 0) {
+                                    status.type = "mouse";
+                                    status.location.start.x = e.clientX;
+                                    status.location.start.y = e.clientY;
+                                    if (e.button == 0) {
+                                        Event_functions.start("click");
+                                    }
+                                    else if (e.button == 2) {
+                                        Event_functions.right_click(e);
+                                    }
+                                    ;
+                                }
+                                ;
+                            },
+                            mouseup: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == "mouse") {
+                                    status.location.end.x = e.clientX;
+                                    status.location.end.y = e.clientY;
+                                    Event_functions.end("click");
+                                }
+                                ;
+                            },
+                            mousecancel: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == "mouse") {
+                                    status.location.end.x = e.clientX;
+                                    status.location.end.y = e.clientY;
+                                    Event_functions.cancel();
+                                }
+                                ;
+                            },
+                            mousemove: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == "mouse" && status.can_move == true) {
+                                    status.location.end.x = e.clientX;
+                                    status.location.end.y = e.clientY;
+                                    Event_functions.move("click");
+                                }
+                                ;
+                            },
+                            touchstart: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == null) {
+                                    input_style_is_tap++;
+                                    setTimeout(function () {
+                                        input_style_is_tap--;
+                                    }, 200);
+                                    status.type = "touch";
+                                    status.location.start.x = e.touches[0].clientX;
+                                    status.location.start.y = e.touches[0].clientY;
+                                    Event_functions.start("tap");
+                                }
+                                ;
+                            },
+                            contextmenu: function (e) {
+                                stop_propagation_check(e);
+                                if (settings.long_tap || settings.right_click) {
+                                    e.preventDefault();
+                                }
+                                ;
+                            },
+                            touchend: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == "touch") {
+                                    status.location.end.x = e.changedTouches[0].clientX;
+                                    status.location.end.y = e.changedTouches[0].clientY;
+                                    Event_functions.end("tap");
+                                }
+                                ;
+                            },
+                            touchcancel: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == "touch") {
+                                    status.location.end.x = e.touches[0].clientX;
+                                    status.location.end.y = e.touches[0].clientY;
+                                    Event_functions.cancel();
+                                }
+                                ;
+                            },
+                            touchmove: function (e) {
+                                stop_propagation_check(e);
+                                if (status.type == "touch" && status.can_move == true) {
+                                    status.location.end.x = e.touches[0].clientX;
+                                    status.location.end.y = e.touches[0].clientY;
+                                    Event_functions.move("tap");
+                                }
+                                ;
+                            }
+                        };
+                        //後でキャンセルできるようにglobal_events配列に設定
+                        global_remove_events.push(click_remove_event_object.this_event);
+                        //イベントリスナーの設定
+                        Object.keys(EventListeners).forEach(function (event_name) {
+                            if (event_name == "mousedown" || event_name == "touchstart" || event_name == "contextmenu") {
+                                element.addEventListener(event_name, EventListeners[event_name]);
+                            }
+                            else {
+                                document.documentElement.addEventListener(event_name, EventListeners[event_name]);
+                            }
+                            ;
+                        });
+                    });
                 }
             };
             //idの設定
