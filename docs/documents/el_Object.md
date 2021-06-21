@@ -102,6 +102,16 @@ el_Object.scroll.auto.Horizontal.right_to_left
 el_Object.scroll.auto.Horizontal.left_to_right
  ```
 
+ # click - クリック、タップ、長押し等のイベントを設定します。
+
+ ```javascript
+Ez.el("#a").click({})
+ ```
+
+ ### [引数の設定](./click/index.md)
+
+
+
 # remove 関数 - 要素の削除
 要素を削除します。
 ```javascript
